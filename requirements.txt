@@ -1,0 +1,29 @@
+# DefectFlywheel GitHub reproduction dependencies
+# If needed, install a CUDA-matched PyTorch build first from https://pytorch.org/get-started/locally/.
+
+numpy>=1.20.0,<2.0.0
+scipy>=1.7.0
+Pillow>=8.0.0
+tqdm>=4.60.0
+PyYAML>=5.4.0
+
+# Core deep learning / vision stack
+torch>=1.10.0
+torchvision>=0.11.0
+opencv-python>=4.5.0
+ftfy
+regex
+git+https://github.com/openai/CLIP.git
+
+# OFA / BLIP-Diffusion / metrics dependencies
+diffusers>=0.20.0
+transformers>=4.30.0
+timm>=0.4.12
+kornia>=0.6.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+tabulate>=0.9.0
+huggingface_hub>=0.19.0
+
+# Optional helper for Google Drive downloads
+gdown>=5.0.0

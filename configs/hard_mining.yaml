@@ -1,0 +1,9 @@
+# 困难样本挖掘默认配置
+anomaly_map_dir: ""
+save_dir: "./outputs/hard_masks"
+out_size: [256, 256]
+method: "top_k"
+top_k_ratio: 0.15
+threshold: 0.5
+sigma_smooth: 1.0
+min_area_ratio: 0.001

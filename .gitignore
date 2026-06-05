@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+env/
+.conda/
+
+# Local data / weights / outputs
+datasets/
+pretrained/
+experiments/
+outputs/
+save/
+results/
+logs/
+wandb/
+
+# Model checkpoints and generated artifacts
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.log
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

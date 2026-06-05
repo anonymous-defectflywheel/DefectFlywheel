@@ -1,0 +1,36 @@
+# 异常样本生成默认配置（模块二）
+# 用法: python scripts/generate_anomaly.py --config configs/generator.yaml [--normal_image path] [--hard_mask_dir path]
+
+# 输入输出
+normal_image: null
+normal_list: null
+hard_mask_dir: null   # 若设置，则优先使用模块一输出的困难 mask（{basename}_mask.png）
+save_dir: "./outputs/generated_anomaly"
+# 若 category/defect 不写或为 null，则从布匹预设中随机选用；指定则用指定值
+category: null
+defect: null
+
+# 图像尺寸
+img_width: 512
+img_height: 512
+num_gen: 1
+
+# 随机 mask 先验（无困难 mask 时使用）
+m_max: 5
+alpha: 0.7
+
+# 风格迁移超参
+crop_size: 128
+num_crops: 64
+max_step: 75
+lr: 0.0005
+thresh: 0.7
+lambda_tv: 0.002
+lambda_pdir: 9000.0
+lambda_gdir: 500.0
+lambda_c: 150.0
+lambda_mclip: 1000.0
+
+# 随机种子与 CLIP 模型
+seed: 77
+clip_model: "ViT-B/32"
