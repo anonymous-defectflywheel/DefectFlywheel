@@ -99,7 +99,7 @@ def main():
     )
     parser.add_argument("--epochs", type=int, default=20, help="透传给 main_zju.py，用于日志与导出时 memory bank 协议一致")
     parser.add_argument("--shot", type=int, default=2, help="透传给 main_zju.py，保证导出 anomaly map 使用同一 few-shot support")
-    parser.add_argument("--seed", type=int, default=42, help="透传给 main_zju.py，保证 support sampling 与主 run 一致")
+    parser.add_argument("--seed", type=int, default=4, help="pass through to main_zju.py to keep support sampling aligned with the release run")
     parser.add_argument("--lr", type=float, default=1e-5, help="透传给 main_zju.py，用于完整配置记录")
     parser.add_argument("--weight_decay", type=float, default=1e-4, help="透传给 main_zju.py，用于完整配置记录")
     parser.add_argument("--scheduler_t_max", type=int, default=20, help="透传给 main_zju.py，用于完整配置记录")

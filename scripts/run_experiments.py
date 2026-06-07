@@ -114,10 +114,10 @@ def _write_run_config(exp_dir, root, args, data_path, ofa_root, normal_list):
     payload = {
         "run_name": os.path.basename(exp_dir),
         "created_at": datetime.now().isoformat(timespec="seconds"),
-        "result_eligibility": f"preliminary/seed{args.seed}" if args.seed == 42 else "main-table-candidate",
+        "result_eligibility": f"reproduction/seed{args.seed}" if args.seed == 4 else "custom-seed",
         "source_repo": root,
         "source_role": "defectflywheel-source",
-        "baseline_source": ofa_root,
+        "baseline_source": "/mnt/data/ouxuewen/gra_project/OneforAll",
         "method": "DefectFlywheel",
         "dataset": args.dataset,
         "data_path": data_path,
@@ -250,7 +250,7 @@ def main():
     parser.add_argument("--lr", type=float, default=1e-5, help="OFA 学习率")
     parser.add_argument("--weight_decay", type=float, default=1e-4, help="OFA weight_decay")
     parser.add_argument("--scheduler_t_max", type=int, default=20, help="CosineAnnealingLR T_max")
-    parser.add_argument("--seed", type=int, default=42, help="随机种子；首轮初步实验固定为 42")
+    parser.add_argument("--seed", type=int, default=4, help="random seed; release reproduction default is 4")
     args = parser.parse_args()
     if getattr(args, "disable_blip", False):
         args.context_backend = "static_prompt"

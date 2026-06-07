@@ -342,7 +342,7 @@ def main():
     parser.add_argument("--lr", type=float, default=1e-5, help="OFA 学习率")
     parser.add_argument("--weight_decay", type=float, default=1e-4, help="OFA weight_decay")
     parser.add_argument("--scheduler_t_max", type=int, default=20, help="OFA CosineAnnealingLR T_max")
-    parser.add_argument("--seed", type=int, default=42, help="OFA 随机种子；首轮初步实验固定为 42")
+    parser.add_argument("--seed", type=int, default=4, help="OFA random seed; release reproduction default is 4")
     parser.add_argument("--display_epoch", type=str, default=None)
     parser.add_argument("--display_epochs", type=str, default=None)
     parser.add_argument("--skip_test", action="store_true", help="如果设置了，则传递给 main_zju.py 跳过测试")

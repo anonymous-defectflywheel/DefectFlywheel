@@ -7,7 +7,7 @@ This repository provides the reproduction package for the DefectFlywheel experim
 - **WFDD**: [Kaggle: The Woven Fabric Defect Detection Dataset](https://www.kaggle.com/datasets/hodinhtrieu/the-woven-fabric-defect-detection-wfdd)
 - **ZJU-Leaper** / `ZJU-Leaper-AllPatterns-MVTec` (`zjuall`): [official website](http://www.qaas.zju.edu.cn/zju-leaper/)
 
-Default reproduction setting:
+Paper-aligned default setting:
 
 ```text
 shot = 2
@@ -42,7 +42,7 @@ python -c "import torch, torchvision, cv2, diffusers, transformers, timm, kornia
 
 ---
 
-## 2. Data and weights
+## 2. Data, BLIP-Diffusion, and checkpoints
 
 ### 2.1 Datasets
 
@@ -64,9 +64,9 @@ DefectFlywheel/
 
 If your datasets are stored elsewhere, pass `DATA_ROOT=/path/to/datasets` when running the scripts.
 
-### 2.2 BLIP-Diffusion weights
+### 2.2 BLIP-Diffusion model
 
-DefectFlywheel uses **BLIP-Diffusion Q-Former context** for the default reproduction scripts. It does not use the older BLIP image-captioning context path.
+DefectFlywheel uses **BLIP-Diffusion Q-Former context** for the default reproduction setting. BLIP-Diffusion is a pretrained foundation model and is different from the DefectFlywheel checkpoints released with this repository.
 
 Recommended local layout:
 
@@ -74,14 +74,11 @@ Recommended local layout:
 DefectFlywheel/
   pretrained/
     blipdiffusion_model/
-      model_index.json              # or a HuggingFace snapshot subdirectory containing model_index.json
+      model_index.json              # or a Hugging Face snapshot subdirectory containing model_index.json
       ...
 ```
 
-Download options:
-
-1. **Prepared artifact folder**: [Google Drive weights and artifacts](https://drive.google.com/drive/folders/1siLVz5BB1-hQxgCrTIPBJir-eovjf01V?usp=drive_link), then place/extract BLIP-Diffusion under `pretrained/blipdiffusion_model/`.
-2. **Official Hugging Face model**: [`Salesforce/blipdiffusion`](https://huggingface.co/Salesforce/blipdiffusion), or use the helper script:
+Download [`Salesforce/blipdiffusion`](https://huggingface.co/Salesforce/blipdiffusion) from Hugging Face, or use the helper script:
 
 ```bash
 python scripts/download_blipdiffusion.py --output_dir pretrained/blipdiffusion_model
@@ -93,7 +90,26 @@ Verify the downloaded model:
 find pretrained/blipdiffusion_model -name model_index.json | head
 ```
 
-If weights are stored elsewhere, pass `PRETRAINED_DIR=/path/to/pretrained`.
+If BLIP-Diffusion is stored elsewhere, pass `PRETRAINED_DIR=/path/to/pretrained`.
+
+### 2.3 Released DefectFlywheel checkpoints
+
+The Google Drive folder contains the trained DefectFlywheel checkpoints and experiment artifacts used for eval-only reproduction. These files are **not** BLIP-Diffusion weights.
+
+[Google Drive checkpoints and artifacts](https://drive.google.com/drive/folders/1siLVz5BB1-hQxgCrTIPBJir-eovjf01V?usp=drive_link)
+
+Recommended local layout:
+
+```text
+DefectFlywheel/
+  checkpoints/
+    wfdd/
+      defectflywheel_wfdd_2shot_seed4_epoch10.pt
+    zjuall/
+      defectflywheel_zjuall_2shot_seed4_epoch10.pt
+```
+
+If your checkpoint filenames differ, keep the same directory structure and replace the `--load_checkpoint` path in the eval-only commands below.
 
 ---
 
@@ -116,7 +132,43 @@ The help output should include:
 
 ---
 
-## 4. Reproduce DefectFlywheel
+## 4. Eval-only reproduction from released checkpoints
+
+Eval-only mode loads a saved DefectFlywheel checkpoint, freezes training, and evaluates on the test set. It still requires BLIP-Diffusion because the detector uses Q-Former context during evaluation.
+
+### WFDD
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python ofa/main_zju.py \
+  --data_path datasets/WFDD \
+  --dataset wfdd \
+  --eval_only \
+  --load_checkpoint checkpoints/wfdd/defectflywheel_wfdd_2shot_seed4_epoch10.pt \
+  --blip_model_path pretrained/blipdiffusion_model \
+  --shot 2 \
+  --seed 4 \
+  --save_path experiments/eval_wfdd_seed4
+```
+
+### ZJU-Leaper (`zjuall`)
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python ofa/main_zju.py \
+  --data_path datasets/ZJU-Leaper-AllPatterns-MVTec \
+  --dataset zju \
+  --eval_only \
+  --load_checkpoint checkpoints/zjuall/defectflywheel_zjuall_2shot_seed4_epoch10.pt \
+  --blip_model_path pretrained/blipdiffusion_model \
+  --shot 2 \
+  --seed 4 \
+  --save_path experiments/eval_zjuall_seed4
+```
+
+---
+
+## 5. Train and evaluate from scratch
+
+The scripts below run the full DefectFlywheel training + final evaluation pipeline with the paper-aligned setting.
 
 ### WFDD
 
@@ -152,12 +204,12 @@ GPU_ID=0 EPOCHS=1 bash scripts/reproduce_defectflywheel_wfdd.sh
 
 ---
 
-## 5. Outputs
+## 6. Outputs
 
-Each script creates a timestamped run directory:
+The training scripts create timestamped run directories:
 
 ```text
-experiments/reproduce_defectflywheel_<dataset>_2shot_seed42_10epoch_<yyyymmdd_HHMMSS>_gpu<id>/
+experiments/reproduce_defectflywheel_<dataset>_2shot_seed<seed>_<epochs>epoch_<yyyymmdd_HHMMSS>_gpu<id>/
 ```
 
 Core files:
@@ -177,18 +229,18 @@ checkpoint_manifest.json
 method_outputs/
 ```
 
-Paper-aligned results use the final DefectFlywheel round only because the scripts set `--eval_policy final_only` and `--baseline_eval_policy final_only`.
+Paper-aligned training results use the final DefectFlywheel round only because the scripts set `--eval_policy final_only` and `--baseline_eval_policy final_only`.
 
 ---
 
-## 6. Runtime options
+## 7. Runtime options
 
 | Variable | Default | Description |
 |---|---|---|
 | `GPU_ID` | `0` | CUDA device id used through `CUDA_VISIBLE_DEVICES` |
 | `DATA_ROOT` | `<repo>/datasets` | Parent directory containing `WFDD` and `ZJU-Leaper-AllPatterns-MVTec` |
 | `PRETRAINED_DIR` | `<repo>/pretrained` | Directory containing `blipdiffusion_model/` |
-| `EXP_ROOT` | `<repo>/experiments` | Output directory for timestamped runs |
+| `EXP_ROOT` | `<repo>/experiments` | Output directory for timestamped training runs |
 | `SHOT` | `2` | Few-shot support count |
 | `SEED` | `4` | Random seed |
 | `EPOCHS` | `10` | Macro epochs; paper-aligned reproduction default is 10 |
@@ -197,6 +249,6 @@ Keep the defaults for paper-aligned reproduction unless running a smoke test.
 
 ---
 
-## 7. Repository hygiene
+## 8. Repository hygiene
 
-Datasets, pretrained weights, checkpoints, and experiment outputs are intentionally ignored by Git. Do not upload large data or model files to GitHub; share them through the Google Drive folder or another artifact host.
+Datasets, BLIP-Diffusion weights, released checkpoints, and experiment outputs are intentionally ignored by Git. Do not upload large data or model files to GitHub; share them through the artifact folder or another external host.
